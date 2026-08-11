@@ -59,7 +59,7 @@ export default function SettingsPage() {
         </Box>
 
         {/* Appearance Settings Card */}
-        <Paper sx={{ p: 4, borderRadius: 4 }}>
+        <Paper sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
             <ThemeIcon color="primary" />
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -68,7 +68,7 @@ export default function SettingsPage() {
           </Box>
           <Divider sx={{ mb: 3 }} />
 
-          <FormControl component="fieldset">
+          <FormControl component="fieldset" sx={{ width: '100%' }}>
             <FormLabel component="legend" sx={{ mb: 2 }}>
               Choose theme preference for shop devices:
             </FormLabel>
@@ -80,11 +80,11 @@ export default function SettingsPage() {
             >
               <FormControlLabel
                 value="system"
-                control={<Radio />}
+                control={<Radio sx={{ mt: -1 }} />}
                 label={
-                  <Box>
+                  <Box sx={{ pr: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 600 }}>System Default</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', whiteSpace: 'normal' }}>
                       Matches the active OS setting on your phone, tablet, or PC
                     </Typography>
                   </Box>
@@ -93,11 +93,11 @@ export default function SettingsPage() {
               />
               <FormControlLabel
                 value="light"
-                control={<Radio />}
+                control={<Radio sx={{ mt: -1 }} />}
                 label={
-                  <Box>
+                  <Box sx={{ pr: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 600 }}>Light Mode</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', whiteSpace: 'normal' }}>
                       Cool slate grey layouts optimized for standard daylight environments
                     </Typography>
                   </Box>
@@ -106,11 +106,11 @@ export default function SettingsPage() {
               />
               <FormControlLabel
                 value="dark"
-                control={<Radio />}
+                control={<Radio sx={{ mt: -1 }} />}
                 label={
-                  <Box>
+                  <Box sx={{ pr: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 600 }}>Dark Mode</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', whiteSpace: 'normal' }}>
                       Deep navy designs that reduce eye-strain in dim shop lighting
                     </Typography>
                   </Box>

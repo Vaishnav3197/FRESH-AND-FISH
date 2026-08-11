@@ -46,7 +46,10 @@ import {
   Alert,
   CircularProgress,
   Tooltip,
-  Chip
+  Chip,
+  useTheme,
+  useMediaQuery,
+  Divider
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -70,6 +73,8 @@ const CATEGORIES = [
 export default function ExpensesPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [rawExpenses, setRawExpenses] = useState<Expense[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -261,12 +266,12 @@ export default function ExpensesPage() {
     <DashboardLayout allowedRoles={['owner']}>
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
         {/* Header bar */}
-        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyBetween: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
+        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
           <Box>
-            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' } }}>
               Expenses Log
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
               Record and oversee business expenditures.
             </Typography>
           </Box>
@@ -275,7 +280,7 @@ export default function ExpensesPage() {
               variant="outlined"
               startIcon={<ReportsIcon />}
               onClick={() => router.push('/reports')}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
             >
               Reports Panel
             </Button>
@@ -283,7 +288,7 @@ export default function ExpensesPage() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleOpenAddModal}
-              sx={{ borderRadius: 3 }}
+              sx={{ borderRadius: 3, py: { xs: 1, sm: 1.5 } }}
             >
               Add Expense
             </Button>
@@ -296,10 +301,10 @@ export default function ExpensesPage() {
         {/* Summary Card */}
         <Card sx={{ mb: 4, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
           <CardContent sx={{ p: 3 }}>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 700, fontSize: '0.75rem' }}>
               Total Filtered Expenses
             </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 800, mt: 1, color: 'warning.main' }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, mt: 1, color: 'warning.main', fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' } }}>
               {formatCurrency(totalExpenses)}
             </Typography>
           </CardContent>
@@ -311,7 +316,7 @@ export default function ExpensesPage() {
             placeholder="Search expense title or note..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ flexGrow: 1, minWidth: 200, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+            sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 200 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
           />
 
           <TextField
@@ -319,7 +324,7 @@ export default function ExpensesPage() {
             label="Category"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            sx={{ width: 160, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+            sx={{ width: { xs: '100%', sm: 160 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
           >
             <MenuItem value="All">All Categories</MenuItem>
             {CATEGORIES.map((cat) => (
@@ -332,7 +337,7 @@ export default function ExpensesPage() {
             label="Timeframe"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value as any)}
-            sx={{ width: 150, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+            sx={{ width: { xs: '100%', sm: 150 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
           >
             <MenuItem value="today">Today</MenuItem>
             <MenuItem value="week">This Week</MenuItem>
@@ -342,103 +347,187 @@ export default function ExpensesPage() {
           </TextField>
 
           {dateFilter === 'custom' && (
-            <>
+            <Box sx={{ display: 'flex', gap: 2, width: { xs: '100%', sm: 'auto' }, flexDirection: { xs: 'column', sm: 'row' } }}>
               <TextField
                 label="From (DD/MM/YYYY)"
                 value={customFromDate}
                 onChange={(e) => setCustomFromDate(e.target.value)}
-                sx={{ width: 170, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+                sx={{ width: { xs: '100%', sm: 170 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
               />
               <TextField
                 label="To (DD/MM/YYYY)"
                 value={customToDate}
                 onChange={(e) => setCustomToDate(e.target.value)}
-                sx={{ width: 170, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+                sx={{ width: { xs: '100%', sm: 170 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
               />
-            </>
+            </Box>
           )}
         </Box>
 
         {/* Expenses List */}
-        <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Expense Title</TableCell>
-                <TableCell>Notes</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={30} />
-                  </TableCell>
-                </TableRow>
-              ) : expenses.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                    <Typography color="text.secondary">No expense records found matching filters.</Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                expenses.map((expense) => (
-                  <TableRow key={expense.expenseId} hover>
-                    <TableCell sx={{ minWidth: 110, fontWeight: 600 }}>
-                      {formatDate(expense.date)}
-                    </TableCell>
-                    <TableCell>
+        {isMobile ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress size={30} /></Box>
+            ) : expenses.length === 0 ? (
+              <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                <Typography color="text.secondary">No expense records found matching filters.</Typography>
+              </Paper>
+            ) : (
+              expenses.map((expense) => (
+                <Card 
+                  key={expense.expenseId} 
+                  sx={{ 
+                    borderRadius: 4, 
+                    boxShadow: 'none',
+                    border: '1px solid',
+                    borderColor: 'divider'
+                  }}
+                >
+                  <CardContent sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                      <Box sx={{ minWidth: 0, mr: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                          {expense.title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDate(expense.date)}
+                        </Typography>
+                      </Box>
                       <Chip
                         label={expense.category}
                         size="small"
                         color="secondary"
                         variant="outlined"
-                        sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                        sx={{ fontWeight: 700, fontSize: '0.65rem' }}
                       />
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      {expense.title}
-                    </TableCell>
-                    <TableCell color="text.secondary" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {expense.notes || '-'}
-                    </TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 800, color: 'warning.main' }}>
-                      {formatCurrency(expense.amount)}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
-                        <Tooltip title="Edit Expense">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => handleOpenEditModal(expense)}
-                            disabled={actionLoading}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Expense">
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleOpenDeleteModal(expense)}
-                            disabled={actionLoading}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                    </Box>
+
+                    {expense.notes && (
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.85rem' }}>
+                        Note: {expense.notes}
+                      </Typography>
+                    )}
+
+                    <Divider sx={{ mb: 1.5 }} />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                          Amount
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: 'warning.main' }}>
+                          {formatCurrency(expense.amount)}
+                        </Typography>
                       </Box>
+
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleOpenEditModal(expense)}
+                          disabled={actionLoading}
+                          sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, p: 0.75 }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleOpenDeleteModal(expense)}
+                          disabled={actionLoading}
+                          sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, p: 0.75 }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell>Expense Title</TableCell>
+                  <TableCell>Notes</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <CircularProgress size={30} />
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ) : expenses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <Typography color="text.secondary">No expense records found matching filters.</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  expenses.map((expense) => (
+                    <TableRow key={expense.expenseId} hover>
+                      <TableCell sx={{ minWidth: 110, fontWeight: 600 }}>
+                        {formatDate(expense.date)}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={expense.category}
+                          size="small"
+                          color="secondary"
+                          variant="outlined"
+                          sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        {expense.title}
+                      </TableCell>
+                      <TableCell color="text.secondary" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {expense.notes || '-'}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 800, color: 'warning.main' }}>
+                        {formatCurrency(expense.amount)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                          <Tooltip title="Edit Expense">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => handleOpenEditModal(expense)}
+                              disabled={actionLoading}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Expense">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleOpenDeleteModal(expense)}
+                              disabled={actionLoading}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
 
         {/* Add/Edit Expense Dialog */}
         <Dialog open={expenseModalOpen} onClose={() => setExpenseModalOpen(false)} maxWidth="xs" fullWidth>

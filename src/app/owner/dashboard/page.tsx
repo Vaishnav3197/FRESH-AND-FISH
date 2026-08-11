@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../hooks/useAuth';
 import { CustomerRepository } from '../../../repositories/CustomerRepository';
 import { CreditRepository } from '../../../repositories/CreditRepository';
@@ -52,7 +52,9 @@ import {
   Autocomplete,
   Tooltip,
   IconButton,
-  Divider
+  Divider,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   PersonAdd as AddCustomerIcon,
@@ -68,13 +70,29 @@ const namesMatch = (name1: string, name2: string): boolean => {
   return n1 === n2;
 };
 
-export default function OwnerDashboard() {
+function OwnerDashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
 
   const [activeTab, setActiveTab] = useState(0);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [allCredits, setAllCredits] = useState<Credit[]>([]);
+
+  useEffect(() => {
+    if (tabParam === 'customers') {
+      setActiveTab(1);
+    } else if (tabParam === 'credits') {
+      setActiveTab(0);
+    } else if (tabParam === 'analytics') {
+      setActiveTab(2);
+    } else if (!tabParam) {
+      setActiveTab(0);
+    }
+  }, [tabParam]);
   const [filteredCredits, setFilteredCredits] = useState<Credit[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -371,12 +389,12 @@ export default function OwnerDashboard() {
     <DashboardLayout allowedRoles={['owner']}>
       <Box sx={{ maxWidth: 1250, mx: 'auto' }}>
         {/* Header Title bar */}
-        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyBetween: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
+        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
           <Box>
-            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' } }}>
               Owner Dashboard
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
               Overviewing billing ledger, collections, and expense records in real-time.
             </Typography>
           </Box>
@@ -385,7 +403,7 @@ export default function OwnerDashboard() {
               variant="outlined"
               startIcon={<AddCustomerIcon />}
               onClick={() => setAddCustOpen(true)}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
             >
               Add Customer
             </Button>
@@ -393,7 +411,7 @@ export default function OwnerDashboard() {
               variant="contained"
               startIcon={<AddCreditIcon />}
               onClick={() => router.push('/credits/new')}
-              sx={{ borderRadius: 3 }}
+              sx={{ borderRadius: 3, py: { xs: 1, sm: 1.5 } }}
             >
               Log Credit
             </Button>
@@ -405,44 +423,44 @@ export default function OwnerDashboard() {
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
         ) : (
           <>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={2.5} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-                <Card sx={{ borderLeft: '4px solid #3b82f6' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                <Card sx={{ borderLeft: '4px solid #3b82f6', height: '100%' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase' }}>
                       Today's Sales
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{formatCurrency(todaySales)}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>{formatCurrency(todaySales)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-                <Card sx={{ borderLeft: '4px solid #ef4444' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                <Card sx={{ borderLeft: '4px solid #ef4444', height: '100%' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase' }}>
                       Today's Credit
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'error.main' }}>{formatCurrency(todayCredit)}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'error.main', fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>{formatCurrency(todayCredit)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-                <Card sx={{ borderLeft: '4px solid #10b981' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                <Card sx={{ borderLeft: '4px solid #10b981', height: '100%' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase' }}>
                       Today's Collection
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'success.main' }}>{formatCurrency(todayCollection)}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'success.main', fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>{formatCurrency(todayCollection)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b', height: '100%' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase' }}>
                       Today's Expenses
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'warning.main' }}>{formatCurrency(todayExpenses)}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: 'warning.main', fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>{formatCurrency(todayExpenses)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -452,13 +470,14 @@ export default function OwnerDashboard() {
                     ? 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)' 
                     : 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
                   color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1e3a8a',
-                  border: 'none'
+                  border: 'none',
+                  height: '100%'
                 }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.8 }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase', opacity: 0.8 }}>
                       Net Income (Today)
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{formatCurrency(netIncome)}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>{formatCurrency(netIncome)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -518,61 +537,145 @@ export default function OwnerDashboard() {
                   )}
                 </Box>
 
-                <TableContainer component={Paper} sx={{ borderRadius: 4, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Customer</TableCell>
-                        <TableCell>Items Description</TableCell>
-                        <TableCell align="right">Amount</TableCell>
-                        <TableCell align="right">Paid</TableCell>
-                        <TableCell align="right">Outstanding</TableCell>
-                        <TableCell align="center">Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredCredits.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                            <Typography color="text.secondary">No credit items match selected filters.</Typography>
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredCredits.map((credit) => {
-                          const outstanding = credit.amount - credit.paidAmount;
-                          return (
-                            <TableRow
-                              key={credit.id}
-                              hover
-                              sx={{ cursor: 'pointer' }}
-                              onClick={() => {
-                                if (credit.customerId) router.push(`/customers/${credit.customerId}`);
-                              }}
-                            >
-                              <TableCell sx={{ fontWeight: 600 }}>{formatDate(credit.purchaseDate)}</TableCell>
-                              <TableCell sx={{ fontWeight: 700 }}>{credit.customerName}</TableCell>
-                              <TableCell sx={{ fontWeight: 500 }}>{credit.items}</TableCell>
-                              <TableCell align="right" sx={{ fontWeight: 600 }}>{formatCurrency(credit.amount)}</TableCell>
-                              <TableCell align="right" color="success.main">{formatCurrency(credit.paidAmount)}</TableCell>
-                              <TableCell align="right" sx={{ color: outstanding > 0 ? 'error.main' : 'text.primary', fontWeight: 700 }}>
-                                {formatCurrency(outstanding)}
-                              </TableCell>
-                              <TableCell align="center">
+                {isMobile ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {filteredCredits.length === 0 ? (
+                      <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                        <Typography color="text.secondary">No credit items match selected filters.</Typography>
+                      </Paper>
+                    ) : (
+                      filteredCredits.map((credit) => {
+                        const outstanding = credit.amount - credit.paidAmount;
+                        return (
+                          <Card 
+                            key={credit.id} 
+                            onClick={() => {
+                              if (credit.customerId) router.push(`/customers/${credit.customerId}`);
+                            }}
+                            sx={{ 
+                              borderRadius: 4, 
+                              cursor: 'pointer',
+                              borderLeft: '4px solid',
+                              borderLeftColor: outstanding > 0 ? 'error.main' : 'success.main',
+                              boxShadow: 'none',
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              '&:hover': { bgcolor: 'action.hover' }
+                            }}
+                          >
+                            <CardContent sx={{ p: 2 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Box sx={{ minWidth: 0, mr: 1 }}>
+                                  <Typography variant="subtitle2" noWrap sx={{ fontWeight: 700 }}>
+                                    {credit.customerName}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {formatDate(credit.purchaseDate)}
+                                  </Typography>
+                                </Box>
                                 <Chip
                                   label={credit.status.toUpperCase()}
                                   size="small"
                                   color={credit.status === 'received' ? 'success' : 'error'}
-                                  sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                                  sx={{ fontWeight: 700, fontSize: '0.65rem', height: 20 }}
                                 />
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                              </Box>
+
+                              <Typography variant="body2" sx={{ fontWeight: 500, mb: 2, mt: 1 }}>
+                                {credit.items}
+                              </Typography>
+
+                              <Divider sx={{ mb: 1.5 }} />
+
+                              <Grid container spacing={1}>
+                                <Grid size={{ xs: 4 }}>
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                    Amount
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                    {formatCurrency(credit.amount)}
+                                  </Typography>
+                                </Grid>
+                                <Grid size={{ xs: 4 }}>
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                    Paid
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>
+                                    {formatCurrency(credit.paidAmount)}
+                                  </Typography>
+                                </Grid>
+                                <Grid size={{ xs: 4 }}>
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                    Outstanding
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ fontWeight: 800, color: outstanding > 0 ? 'error.main' : 'text.primary' }}>
+                                    {formatCurrency(outstanding)}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        );
+                      })
+                    )}
+                  </Box>
+                ) : (
+                  <TableContainer component={Paper} sx={{ borderRadius: 4, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Customer</TableCell>
+                          <TableCell>Items Description</TableCell>
+                          <TableCell align="right">Amount</TableCell>
+                          <TableCell align="right">Paid</TableCell>
+                          <TableCell align="right">Outstanding</TableCell>
+                          <TableCell align="center">Status</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {filteredCredits.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                              <Typography color="text.secondary">No credit items match selected filters.</Typography>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          filteredCredits.map((credit) => {
+                            const outstanding = credit.amount - credit.paidAmount;
+                            return (
+                              <TableRow
+                                key={credit.id}
+                                hover
+                                sx={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  if (credit.customerId) router.push(`/customers/${credit.customerId}`);
+                                }}
+                              >
+                                <TableCell sx={{ fontWeight: 600 }}>{formatDate(credit.purchaseDate)}</TableCell>
+                                <TableCell sx={{ fontWeight: 700 }}>{credit.customerName}</TableCell>
+                                <TableCell sx={{ fontWeight: 500 }}>{credit.items}</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>{formatCurrency(credit.amount)}</TableCell>
+                                <TableCell align="right" sx={{ color: 'success.main' }}>{formatCurrency(credit.paidAmount)}</TableCell>
+                                <TableCell align="right" sx={{ color: outstanding > 0 ? 'error.main' : 'text.primary', fontWeight: 700 }}>
+                                  {formatCurrency(outstanding)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <Chip
+                                    label={credit.status.toUpperCase()}
+                                    size="small"
+                                    color={credit.status === 'received' ? 'success' : 'error'}
+                                    sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
               </Box>
             )}
 
@@ -644,7 +747,7 @@ export default function OwnerDashboard() {
                     <CardContent sx={{ p: 3 }}>
                       <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>Top Outstanding Accounts</Typography>
                       {byOutstanding.map((item, idx) => (
-                        <Box key={idx} sx={{ display: 'flex', justifyBetween: 'space-between', py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+                        <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.customerName}</Typography>
                           <Typography variant="body2" color="error.main" sx={{ fontWeight: 700 }}>{formatCurrency(item.outstandingAmount)}</Typography>
                         </Box>
@@ -652,7 +755,7 @@ export default function OwnerDashboard() {
 
                       <Typography variant="h6" sx={{ fontWeight: 800, mt: 4, mb: 2 }}>Top Buying Customers</Typography>
                       {byPurchases.map((item, idx) => (
-                        <Box key={idx} sx={{ display: 'flex', justifyBetween: 'space-between', py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+                        <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.customerName}</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{formatCurrency(item.totalPurchases)}</Typography>
                         </Box>
@@ -669,7 +772,7 @@ export default function OwnerDashboard() {
                       <Box sx={{ maxHeight: 350, overflowY: 'auto' }}>
                         {recentActivities.map((act, idx) => (
                           <Box key={idx} sx={{ py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                            <Box sx={{ display: 'flex', justifyBetween: 'space-between', alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.85rem' }}>{act.title}</Typography>
                               <Typography variant="caption" color="text.secondary">{formatDate(act.timestamp)}</Typography>
                             </Box>
@@ -830,6 +933,14 @@ export default function OwnerDashboard() {
         </Dialog>
       </Box>
     </DashboardLayout>
+  );
+}
+
+export default function OwnerDashboard() {
+  return (
+    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>}>
+      <OwnerDashboardContent />
+    </Suspense>
   );
 }
 

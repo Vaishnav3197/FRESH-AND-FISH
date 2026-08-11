@@ -20,7 +20,9 @@ import {
   Alert,
   Breadcrumbs,
   Link,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   ArrowBack as BackIcon,
@@ -34,6 +36,8 @@ function AddCreditForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const prefilledName = searchParams.get('name') || '';
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loadingCustomers, setLoadingCustomers] = useState(true);
@@ -172,7 +176,7 @@ function AddCreditForm() {
 
         {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
 
-        <Paper sx={{ p: 4, borderRadius: 4 }}>
+        <Paper sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4 }}>
           <Box component="form" onSubmit={handleSave} noValidate>
             <Grid container spacing={3}>
               {/* Customer Autocomplete */}
@@ -261,13 +265,14 @@ function AddCreditForm() {
               </Grid>
 
               {/* Action Buttons */}
-              <Grid size={{ xs: 12 }} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+              <Grid size={{ xs: 12 }} sx={{ display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: 2, justifyContent: 'flex-end', mt: 2 }}>
                 <Button
                   variant="outlined"
                   startIcon={<CancelIcon />}
                   onClick={() => router.back()}
-                  sx={{ borderRadius: 3 }}
+                  sx={{ borderRadius: 3, py: { xs: 1.25, sm: 1 } }}
                   disabled={submitting}
+                  fullWidth={isMobile}
                 >
                   Cancel
                 </Button>
@@ -275,8 +280,9 @@ function AddCreditForm() {
                   type="submit"
                   variant="contained"
                   startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                  sx={{ borderRadius: 3 }}
+                  sx={{ borderRadius: 3, py: { xs: 1.25, sm: 1 } }}
                   disabled={submitting}
+                  fullWidth={isMobile}
                 >
                   {submitting ? 'Saving...' : 'Save Credit'}
                 </Button>

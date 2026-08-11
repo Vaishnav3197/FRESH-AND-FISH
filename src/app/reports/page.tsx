@@ -39,7 +39,9 @@ import {
   Divider,
   Chip,
   Breadcrumbs,
-  Link
+  Link,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Download as ExportIcon,
@@ -61,6 +63,8 @@ const CATEGORIES = [
 export default function ReportsPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
@@ -287,21 +291,21 @@ export default function ReportsPage() {
         </Breadcrumbs>
 
         {/* Header Title bar */}
-        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyBetween: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
+        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
           <Box>
-            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' } }}>
               Expense Reports
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
               Review breakdowns, categories summaries, and download reports.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'flex-end', sm: 'flex-start' } }}>
             <Button
               variant="outlined"
               startIcon={<ExportIcon />}
               onClick={exportCSV}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
               disabled={filteredExpenses.length === 0}
             >
               Export CSV
@@ -310,7 +314,7 @@ export default function ReportsPage() {
               variant="contained"
               startIcon={<ExportIcon />}
               onClick={exportPDF}
-              sx={{ borderRadius: 3 }}
+              sx={{ borderRadius: 3, py: { xs: 1, sm: 1.5 } }}
               disabled={filteredExpenses.length === 0}
             >
               Download PDF
@@ -416,7 +420,7 @@ export default function ReportsPage() {
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>{getFilterRangeLabel()}</Typography>
 
                   <Typography variant="body2" color="text.secondary">Total Expenditures</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'warning.main', mb: 2 }}>{formatCurrency(totalFiltered)}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'warning.main', mb: 2, fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' } }}>{formatCurrency(totalFiltered)}</Typography>
 
                   <Typography variant="body2" color="text.secondary">Number of Entries</Typography>
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>{filteredExpenses.length} logs</Typography>
@@ -459,36 +463,33 @@ export default function ReportsPage() {
 
             {/* Expense logs list */}
             <Grid size={{ xs: 12, md: 8 }}>
-              <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Expense Title</TableCell>
-                      <TableCell>Category</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredExpenses.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
-                          <Typography color="text.secondary">No expenditures found within this filter range.</Typography>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredExpenses.map((expense) => (
-                        <TableRow key={expense.expenseId} hover>
-                          <TableCell sx={{ fontWeight: 600 }}>{formatDate(expense.date)}</TableCell>
-                          <TableCell sx={{ fontWeight: 700 }}>
-                            {expense.title}
-                            {expense.notes && (
-                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                {expense.notes}
+              {isMobile ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {filteredExpenses.length === 0 ? (
+                    <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                      <Typography color="text.secondary">No expenditures found within this filter range.</Typography>
+                    </Paper>
+                  ) : (
+                    filteredExpenses.map((expense) => (
+                      <Card 
+                        key={expense.expenseId} 
+                        sx={{ 
+                          borderRadius: 4, 
+                          boxShadow: 'none',
+                          border: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      >
+                        <CardContent sx={{ p: 2 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                            <Box sx={{ minWidth: 0, mr: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {expense.title}
                               </Typography>
-                            )}
-                          </TableCell>
-                          <TableCell>
+                              <Typography variant="caption" color="text.secondary">
+                                {formatDate(expense.date)}
+                              </Typography>
+                            </Box>
                             <Chip
                               label={expense.category}
                               size="small"
@@ -496,16 +497,78 @@ export default function ReportsPage() {
                               color="secondary"
                               sx={{ fontWeight: 700, fontSize: '0.65rem' }}
                             />
-                          </TableCell>
-                          <TableCell align="right" sx={{ fontWeight: 800, color: 'warning.main' }}>
-                            {formatCurrency(expense.amount)}
+                          </Box>
+
+                          {expense.notes && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.85rem' }}>
+                              Note: {expense.notes}
+                            </Typography>
+                          )}
+
+                          <Divider sx={{ mb: 1.5 }} />
+
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                              Amount
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 800, color: 'warning.main' }}>
+                              {formatCurrency(expense.amount)}
+                            </Typography>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </Box>
+              ) : (
+                <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Expense Title</TableCell>
+                        <TableCell>Category</TableCell>
+                        <TableCell align="right">Amount</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredExpenses.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                            <Typography color="text.secondary">No expenditures found within this filter range.</Typography>
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                      ) : (
+                        filteredExpenses.map((expense) => (
+                          <TableRow key={expense.expenseId} hover>
+                            <TableCell sx={{ fontWeight: 600 }}>{formatDate(expense.date)}</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>
+                              {expense.title}
+                              {expense.notes && (
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                  {expense.notes}
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={expense.category}
+                                size="small"
+                                variant="outlined"
+                                color="secondary"
+                                sx={{ fontWeight: 700, fontSize: '0.65rem' }}
+                              />
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 800, color: 'warning.main' }}>
+                              {formatCurrency(expense.amount)}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Grid>
           </Grid>
         )}

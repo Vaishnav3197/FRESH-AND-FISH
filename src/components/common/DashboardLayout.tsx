@@ -34,7 +34,10 @@ import {
   ExitToApp as LogoutIcon,
   Brightness4 as DarkIcon,
   Brightness7 as LightIcon,
-  SetMeal as FishIcon
+  SetMeal as FishIcon,
+  People as PeopleIcon,
+  Payment as CreditIcon,
+  TrendingUp as AnalyticsIcon
 } from '@mui/icons-material';
 
 interface DashboardLayoutProps {
@@ -86,6 +89,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       roles: ['owner', 'employee'],
     },
     {
+      text: 'Customers',
+      icon: <PeopleIcon />,
+      path: user?.role === 'employee' ? '/employee/dashboard?tab=customers' : '/owner/dashboard?tab=customers',
+      roles: ['owner', 'employee'],
+    },
+    {
+      text: 'Credits',
+      icon: <CreditIcon />,
+      path: user?.role === 'employee' ? '/employee/dashboard?tab=credits' : '/owner/dashboard?tab=credits',
+      roles: ['owner', 'employee'],
+    },
+    {
       text: 'Expenses',
       icon: <ExpenseIcon />,
       path: '/expenses',
@@ -95,6 +110,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       text: 'Reports',
       icon: <ReportsIcon />,
       path: '/reports',
+      roles: ['owner'],
+    },
+    {
+      text: 'Analytics',
+      icon: <AnalyticsIcon />,
+      path: '/owner/dashboard?tab=analytics',
       roles: ['owner'],
     },
     {
@@ -183,21 +204,21 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             color: 'text.primary',
           }}
         >
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1.5, sm: 3 } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
               {isMobile && (
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
                   edge="start"
                   onClick={() => setDrawerOpen(true)}
-                  sx={{ mr: 1 }}
+                  sx={{ mr: 0.5 }}
                 >
                   <MenuIcon />
                 </IconButton>
               )}
-              <FishIcon color="primary" sx={{ fontSize: 28 }} />
-              <Typography variant="h6" noWrap sx={{ fontWeight: 800, letterSpacing: '-0.025em' }}>
+              <FishIcon color="primary" sx={{ fontSize: { xs: 24, sm: 28 } }} />
+              <Typography variant="h6" noWrap sx={{ fontWeight: 800, letterSpacing: '-0.025em', fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
                 Fresh & Fish
               </Typography>
             </Box>
@@ -205,14 +226,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {/* Theme Toggle */}
               <Tooltip title={`Switch to ${themeMode === 'light' ? 'Dark' : 'Light'} Mode`}>
-                <IconButton onClick={toggleTheme} color="inherit" sx={{ mr: 1 }}>
+                <IconButton onClick={toggleTheme} color="inherit" sx={{ mr: { xs: 0, sm: 1 } }}>
                   {themeMode === 'light' ? <DarkIcon /> : <LightIcon />}
                 </IconButton>
               </Tooltip>
 
               {/* User Avatar Menu trigger */}
               <IconButton onClick={handleProfileMenuOpen} sx={{ p: 0 }}>
-                <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36, fontSize: '0.95rem', fontWeight: 600 }}>
+                <Avatar sx={{ bgcolor: 'primary.main', width: { xs: 32, sm: 36 }, height: { xs: 32, sm: 36 }, fontSize: '0.95rem', fontWeight: 600 }}>
                   {user?.name?.charAt(0) || 'U'}
                 </Avatar>
               </IconButton>
@@ -270,7 +291,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         )}
 
         {/* Main Content Area */}
-        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2.5, md: 4 }, overflow: 'hidden' }}>
+        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3, md: 4 }, overflow: 'hidden' }}>
           <Toolbar />
           {children}
         </Box>

@@ -13,7 +13,9 @@ import {
   Grid,
   Avatar,
   Tooltip,
-  InputAdornment
+  InputAdornment,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -40,6 +42,8 @@ export const CustomerList: React.FC<CustomerListProps> = ({
   onMergeClick,
   isOwner,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [search, setSearch] = useState('');
 
   const filteredCustomers = customers.filter((customer) =>
@@ -93,52 +97,59 @@ export const CustomerList: React.FC<CustomerListProps> = ({
                 }}
                 onClick={() => onCustomerClick(customer.customerId)}
               >
-                <CardContent sx={{ display: 'flex', alignItems: 'center', p: '20px !important' }}>
-                  {/* Avatar */}
-                  <Avatar
-                    sx={{
-                      bgcolor: customer.totalDue > 0 ? 'primary.main' : 'secondary.main',
-                      color: customer.totalDue > 0 ? 'primary.contrastText' : 'white',
-                      fontWeight: 700,
-                      mr: 2,
-                    }}
-                  >
-                    {customer.name.charAt(0).toUpperCase()}
-                  </Avatar>
-
-                  {/* Customer details */}
-                  <Box sx={{ flexGrow: 1, minWidth: 0, mr: 1 }}>
-                    <Typography variant="h6" noWrap sx={{ fontWeight: 700, fontSize: '1.05rem' }}>
-                      {customer.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {customer.phone || 'No phone'}
-                    </Typography>
-                    <Typography
-                      variant="body2"
+                <CardContent sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, p: '16px !important' }}>
+                  {/* Customer Info row */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, minWidth: 0 }}>
+                    {/* Avatar */}
+                    <Avatar
                       sx={{
+                        bgcolor: customer.totalDue > 0 ? 'primary.main' : 'secondary.main',
+                        color: customer.totalDue > 0 ? 'primary.contrastText' : 'white',
                         fontWeight: 700,
-                        mt: 0.5,
-                        color: customer.totalDue > 0 ? 'error.main' : 'success.main',
+                        mr: 2,
                       }}
                     >
-                      {customer.totalDue > 0
-                        ? `Balance: ${formatCurrency(customer.totalDue)}`
-                        : 'No Outstanding'}
-                    </Typography>
+                      {customer.name.charAt(0).toUpperCase()}
+                    </Avatar>
+
+                    {/* Customer details */}
+                    <Box sx={{ flexGrow: 1, minWidth: 0, mr: 1 }}>
+                      <Typography variant="h6" noWrap sx={{ fontWeight: 700, fontSize: '1.05rem' }}>
+                        {customer.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" noWrap>
+                        {customer.phone || 'No phone'}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 700,
+                          mt: 0.5,
+                          color: customer.totalDue > 0 ? 'error.main' : 'success.main',
+                        }}
+                      >
+                        {customer.totalDue > 0
+                          ? `Balance: ${formatCurrency(customer.totalDue)}`
+                          : 'No Outstanding'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                        Added by: {customer.addedBy || 'System'}
+                      </Typography>
+                    </Box>
                   </Box>
 
                   {/* Actions buttons */}
                   <Box
-                    sx={{ display: 'flex', gap: 0.5 }}
+                    sx={{ display: 'flex', gap: 1, mt: { xs: 1.5, sm: 0 }, justifyContent: { xs: 'flex-end', sm: 'center' }, borderTop: { xs: '1px solid', sm: 'none' }, borderColor: 'divider', pt: { xs: 1, sm: 0 } }}
                     onClick={(e) => e.stopPropagation()} // Prevent card navigation click
                   >
                     {isOwner && onMergeClick && (
                       <Tooltip title="Merge Customer">
                         <IconButton
-                          size="small"
+                          size="medium"
                           color="secondary"
                           onClick={() => onMergeClick(customer)}
+                          sx={{ p: 1 }}
                         >
                           <MergeIcon fontSize="small" />
                         </IconButton>
@@ -147,9 +158,10 @@ export const CustomerList: React.FC<CustomerListProps> = ({
                     {isOwner && onEditClick && (
                       <Tooltip title="Edit Profile">
                         <IconButton
-                          size="small"
+                          size="medium"
                           color="primary"
                           onClick={() => onEditClick(customer)}
+                          sx={{ p: 1 }}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
@@ -158,15 +170,16 @@ export const CustomerList: React.FC<CustomerListProps> = ({
                     {isOwner && onDeleteClick && (
                       <Tooltip title="Delete Profile">
                         <IconButton
-                          size="small"
+                          size="medium"
                           color="error"
                           onClick={() => onDeleteClick(customer)}
+                          sx={{ p: 1 }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                    <IconButton size="small" disabled sx={{ color: 'text.secondary' }}>
+                    <IconButton size="medium" disabled sx={{ color: 'text.secondary', p: 1 }}>
                       <ArrowIcon />
                     </IconButton>
                   </Box>

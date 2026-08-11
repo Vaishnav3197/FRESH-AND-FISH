@@ -19,7 +19,9 @@ import {
   Alert,
   Breadcrumbs,
   Link,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   ArrowBack as BackIcon,
@@ -34,6 +36,8 @@ export default function EditCreditPage({ params }: { params: Promise<{ id: strin
 
   const { user } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [credit, setCredit] = useState<Credit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,7 +167,7 @@ export default function EditCreditPage({ params }: { params: Promise<{ id: strin
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>
         ) : (
-          <Paper sx={{ p: 4, borderRadius: 4 }}>
+          <Paper sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4 }}>
             <Box component="form" onSubmit={handleUpdate} noValidate>
               <Grid container spacing={3}>
                 {/* Customer name */}
@@ -238,13 +242,14 @@ export default function EditCreditPage({ params }: { params: Promise<{ id: strin
                 </Grid>
 
                 {/* Buttons */}
-                <Grid size={{ xs: 12 }} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+                <Grid size={{ xs: 12 }} sx={{ display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: 2, justifyContent: 'flex-end', mt: 2 }}>
                   <Button
                     variant="outlined"
                     startIcon={<CancelIcon />}
                     onClick={() => router.back()}
-                    sx={{ borderRadius: 3 }}
+                    sx={{ borderRadius: 3, py: { xs: 1.25, sm: 1 } }}
                     disabled={submitting}
+                    fullWidth={isMobile}
                   >
                     Cancel
                   </Button>
@@ -252,8 +257,9 @@ export default function EditCreditPage({ params }: { params: Promise<{ id: strin
                     type="submit"
                     variant="contained"
                     startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                    sx={{ borderRadius: 3 }}
+                    sx={{ borderRadius: 3, py: { xs: 1.25, sm: 1 } }}
                     disabled={submitting}
+                    fullWidth={isMobile}
                   >
                     {submitting ? 'Saving...' : 'Save Changes'}
                   </Button>

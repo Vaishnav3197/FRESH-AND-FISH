@@ -381,14 +381,14 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         {successMsg && <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>{successMsg}</Alert>}
 
         {/* Summary Widgets */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={2.5} sx={{ mb: 4 }}>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600, fontSize: '0.75rem' }}>
                   Total Credited
                 </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1 }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1, fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' } }}>
                   {formatCurrency(totalCredits)}
                 </Typography>
               </CardContent>
@@ -396,11 +396,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Card sx={{ bgcolor: 'success.main', color: 'white', height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600, fontSize: '0.75rem' }}>
                   Total Collected
                 </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1 }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1, fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' } }}>
                   {formatCurrency(totalPaid)}
                 </Typography>
               </CardContent>
@@ -408,11 +408,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Card sx={{ bgcolor: 'error.main', color: 'white', height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ opacity: 0.8, textTransform: 'uppercase', fontWeight: 600, fontSize: '0.75rem' }}>
                   Total Outstanding
                 </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1 }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1, fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' } }}>
                   {formatCurrency(totalOutstanding)}
                 </Typography>
               </CardContent>
@@ -421,8 +421,8 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         </Grid>
 
         {/* Toolbar & Filters */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyBetween: 'space-between', gap: 2, mb: 3 }}>
-          <Box sx={{ display: 'flex', flexGrow: 1, gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, mb: 3 }}>
+          <Box sx={{ display: 'flex', flexGrow: 1, gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
             <TextField
               placeholder="Search items desc or date..."
               value={search}
@@ -433,19 +433,19 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              sx={{ width: 160, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
+              sx={{ width: { xs: '100%', sm: 160 }, '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
             >
               <MenuItem value="All">All Status</MenuItem>
               <MenuItem value="Outstanding">Outstanding</MenuItem>
               <MenuItem value="Received">Received</MenuItem>
             </TextField>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: { xs: 'flex-end', md: 'flex-start' } }}>
             <Button
               variant="outlined"
               startIcon={<ExportIcon />}
               onClick={exportCSV}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
             >
               CSV
             </Button>
@@ -453,7 +453,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               variant="outlined"
               startIcon={<ExportIcon />}
               onClick={exportPDF}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
             >
               PDF
             </Button>
@@ -461,7 +461,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               variant="contained"
               startIcon={<AddCreditIcon />}
               onClick={() => router.push(`/credits/new?name=${encodeURIComponent(customer?.name || '')}`)}
-              sx={{ borderRadius: 3 }}
+              sx={{ borderRadius: 3, py: { xs: 1, sm: 1.5 } }}
             >
               New Credit
             </Button>
@@ -469,136 +469,280 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         </Box>
 
         {/* Ledger Table */}
-        <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Items Description</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Paid</TableCell>
-                <TableCell align="right">Outstanding</TableCell>
-                <TableCell align="center">Status</TableCell>
-                <TableCell align="right">Running Balance</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={30} />
-                  </TableCell>
-                </TableRow>
-              ) : credits.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <Typography color="text.secondary">No credit history recorded.</Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                credits.map((credit) => {
-                  const outstanding = credit.amount - credit.paidAmount;
-                  const isReceived = credit.status === 'received';
-                  return (
-                    <TableRow key={credit.id} hover>
-                      <TableCell sx={{ minWidth: 110 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {formatDate(credit.purchaseDate)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {formatDateTime(credit.purchaseDate).split(' ')[1]}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ maxWidth: 260 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {credit.items}
-                        </Typography>
-                        {credit.notes && (
+        {isMobile ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress size={30} /></Box>
+            ) : credits.length === 0 ? (
+              <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                <Typography color="text.secondary">No credit history recorded.</Typography>
+              </Paper>
+            ) : (
+              credits.map((credit) => {
+                const outstanding = credit.amount - credit.paidAmount;
+                const isReceived = credit.status === 'received';
+                return (
+                  <Card 
+                    key={credit.id} 
+                    sx={{ 
+                      borderRadius: 4, 
+                      borderLeft: '4px solid',
+                      borderLeftColor: isReceived ? 'success.main' : 'error.main',
+                      boxShadow: 'none',
+                      border: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Box sx={{ minWidth: 0, mr: 1 }}>
                           <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                            Note: {credit.notes}
+                            {formatDate(credit.purchaseDate)} at {formatDateTime(credit.purchaseDate).split(' ')[1]}
                           </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600 }}>
-                        {formatCurrency(credit.amount)}
-                      </TableCell>
-                      <TableCell align="right" color="success.main">
-                        {formatCurrency(credit.paidAmount)}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: outstanding > 0 ? 'error.main' : 'text.primary', fontWeight: 600 }}>
-                        {formatCurrency(outstanding)}
-                      </TableCell>
-                      <TableCell align="center">
+                        </Box>
                         <Chip
                           label={credit.status.toUpperCase()}
                           size="small"
                           color={isReceived ? 'success' : 'error'}
-                          sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                          sx={{ fontWeight: 700, fontSize: '0.65rem', height: 20 }}
                         />
-                      </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
-                        {formatCurrency(runningBalances[credit.id] || 0)}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
-                          {outstanding > 0 && (
-                            <>
-                              <Tooltip title="Quick Full Settlement">
-                                <IconButton
-                                  size="small"
-                                  color="success"
-                                  onClick={() => handleMarkAsReceived(credit)}
-                                  disabled={actionLoading}
-                                >
-                                  <ReceivedIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Record Payment">
-                                <IconButton
-                                  size="small"
-                                  color="primary"
-                                  onClick={() => handleOpenPaymentDialog(credit)}
-                                  disabled={actionLoading}
-                                >
-                                  <PayIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </>
+                      </Box>
+
+                      <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                        {credit.items}
+                      </Typography>
+                      {credit.notes && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                          Note: {credit.notes}
+                        </Typography>
+                      )}
+
+                      <Divider sx={{ my: 1.5 }} />
+
+                      <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Amount
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {formatCurrency(credit.amount)}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Paid
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
+                            {formatCurrency(credit.paidAmount)}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Outstanding
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: outstanding > 0 ? 'error.main' : 'text.primary' }}>
+                            {formatCurrency(outstanding)}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Running Bal
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                            {formatCurrency(runningBalances[credit.id] || 0)}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+
+                      <Divider sx={{ mb: 1.5 }} />
+
+                      {/* Card Actions */}
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, pt: 0.5 }}>
+                        {outstanding > 0 && (
+                          <>
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="success"
+                              onClick={() => handleMarkAsReceived(credit)}
+                              disabled={actionLoading}
+                              sx={{ borderRadius: 2, fontSize: '0.75rem', px: 1.5 }}
+                            >
+                              Settle
+                            </Button>
+                            <Button
+                              size="small"
+                              variant="contained"
+                              color="primary"
+                              onClick={() => handleOpenPaymentDialog(credit)}
+                              disabled={actionLoading}
+                              sx={{ borderRadius: 2, fontSize: '0.75rem', px: 1.5 }}
+                            >
+                              Pay
+                            </Button>
+                          </>
+                        )}
+                        {isOwner && (
+                          <>
+                            <IconButton
+                              size="small"
+                              color="info"
+                              onClick={() => router.push(`/credits/${credit.id}/edit`)}
+                              disabled={actionLoading}
+                              sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, p: 0.75 }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleOpenDeleteDialog(credit)}
+                              disabled={actionLoading}
+                              sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, p: 0.75 }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Items Description</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell align="right">Paid</TableCell>
+                  <TableCell align="right">Outstanding</TableCell>
+                  <TableCell align="center">Status</TableCell>
+                  <TableCell align="right">Running Balance</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                      <CircularProgress size={30} />
+                    </TableCell>
+                  </TableRow>
+                ) : credits.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                      <Typography color="text.secondary">No credit history recorded.</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  credits.map((credit) => {
+                    const outstanding = credit.amount - credit.paidAmount;
+                    const isReceived = credit.status === 'received';
+                    return (
+                      <TableRow key={credit.id} hover>
+                        <TableCell sx={{ minWidth: 110 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {formatDate(credit.purchaseDate)}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDateTime(credit.purchaseDate).split(' ')[1]}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: 260 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {credit.items}
+                          </Typography>
+                          {credit.notes && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              Note: {credit.notes}
+                            </Typography>
                           )}
-                          {isOwner && (
-                            <>
-                              <Tooltip title="Edit Credit">
-                                <IconButton
-                                  size="small"
-                                  color="info"
-                                  onClick={() => router.push(`/credits/${credit.id}/edit`)}
-                                  disabled={actionLoading}
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Delete Record">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => handleOpenDeleteDialog(credit)}
-                                  disabled={actionLoading}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </>
-                          )}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 600 }}>
+                          {formatCurrency(credit.amount)}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: 'success.main' }}>
+                          {formatCurrency(credit.paidAmount)}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: outstanding > 0 ? 'error.main' : 'text.primary', fontWeight: 600 }}>
+                          {formatCurrency(outstanding)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={credit.status.toUpperCase()}
+                            size="small"
+                            color={isReceived ? 'success' : 'error'}
+                            sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                          />
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>
+                          {formatCurrency(runningBalances[credit.id] || 0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                            {outstanding > 0 && (
+                              <>
+                                <Tooltip title="Quick Full Settlement">
+                                  <IconButton
+                                    size="small"
+                                    color="success"
+                                    onClick={() => handleMarkAsReceived(credit)}
+                                    disabled={actionLoading}
+                                  >
+                                    <ReceivedIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Record Payment">
+                                  <IconButton
+                                    size="small"
+                                    color="primary"
+                                    onClick={() => handleOpenPaymentDialog(credit)}
+                                    disabled={actionLoading}
+                                  >
+                                    <PayIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </>
+                            )}
+                            {isOwner && (
+                              <>
+                                <Tooltip title="Edit Credit">
+                                  <IconButton
+                                    size="small"
+                                    color="info"
+                                    onClick={() => router.push(`/credits/${credit.id}/edit`)}
+                                    disabled={actionLoading}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete Record">
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => handleOpenDeleteDialog(credit)}
+                                    disabled={actionLoading}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
 
         {/* Record Payment Dialog */}
         <Dialog open={paymentDialogOpen} onClose={() => setPaymentDialogOpen(false)}>

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../hooks/useAuth';
 import { CustomerRepository } from '../../../repositories/CustomerRepository';
 import { CreditRepository } from '../../../repositories/CreditRepository';
@@ -29,7 +29,13 @@ import {
   TableHead,
   TableRow,
   CircularProgress,
-  Chip
+  Chip,
+  useTheme,
+  useMediaQuery,
+  Card,
+  CardContent,
+  Divider,
+  Grid
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,11 +43,26 @@ import {
   AddCard as AddCreditIcon
 } from '@mui/icons-material';
 
-export default function EmployeeDashboard() {
+function EmployeeDashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
 
   const [activeTab, setActiveTab] = useState(0);
+
+  useEffect(() => {
+    if (tabParam === 'customers') {
+      setActiveTab(1);
+    } else if (tabParam === 'credits') {
+      setActiveTab(0);
+    } else if (!tabParam) {
+      setActiveTab(0);
+    }
+  }, [tabParam]);
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [credits, setCredits] = useState<Credit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,12 +131,12 @@ export default function EmployeeDashboard() {
     <DashboardLayout allowedRoles={['employee']}>
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
         {/* Welcome Section */}
-        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyBetween: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
+        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
           <Box>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 800 }}>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 800, fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}>
               Welcome back, {user?.name}!
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
               Logged in as Shop Employee. You can log credits and create customer profiles.
             </Typography>
           </Box>
@@ -124,7 +145,7 @@ export default function EmployeeDashboard() {
               variant="outlined"
               startIcon={<AddCustomerIcon />}
               onClick={() => setAddCustOpen(true)}
-              sx={{ borderRadius: 3, bgcolor: 'background.paper' }}
+              sx={{ borderRadius: 3, bgcolor: 'background.paper', py: { xs: 1, sm: 1.5 } }}
             >
               Add Customer
             </Button>
@@ -132,7 +153,7 @@ export default function EmployeeDashboard() {
               variant="contained"
               startIcon={<AddCreditIcon />}
               onClick={() => router.push('/credits/new')}
-              sx={{ borderRadius: 3 }}
+              sx={{ borderRadius: 3, py: { xs: 1, sm: 1.5 } }}
             >
               Add Credit
             </Button>
@@ -160,56 +181,131 @@ export default function EmployeeDashboard() {
           </Box>
         ) : activeTab === 0 ? (
           /* Recent Credit List */
-          <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Items Description</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="right">Paid</TableCell>
-                  <TableCell align="center">Status</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {credits.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No credits logged yet.</Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  credits.slice(0, 50).map((credit) => (
-                    <TableRow
-                      key={credit.id}
-                      hover
-                      sx={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        if (credit.customerId) {
-                          router.push(`/customers/${credit.customerId}`);
-                        }
-                      }}
-                    >
-                      <TableCell sx={{ fontWeight: 600 }}>{formatDate(credit.purchaseDate)}</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>{credit.customerName}</TableCell>
-                      <TableCell sx={{ fontWeight: 500 }}>{credit.items}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>{formatCurrency(credit.amount)}</TableCell>
-                      <TableCell align="right" sx={{ color: 'success.main' }}>{formatCurrency(credit.paidAmount)}</TableCell>
-                      <TableCell align="center">
+          isMobile ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {credits.length === 0 ? (
+                <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                  <Typography color="text.secondary">No credits logged yet.</Typography>
+                </Paper>
+              ) : (
+                credits.slice(0, 50).map((credit) => (
+                  <Card 
+                    key={credit.id} 
+                    onClick={() => {
+                      if (credit.customerId) {
+                        router.push(`/customers/${credit.customerId}`);
+                      }
+                    }}
+                    sx={{ 
+                      borderRadius: 4, 
+                      cursor: 'pointer',
+                      borderLeft: '4px solid',
+                      borderLeftColor: credit.status === 'received' ? 'success.main' : 'error.main',
+                      boxShadow: 'none',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': { bgcolor: 'action.hover' }
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Box sx={{ minWidth: 0, mr: 1 }}>
+                          <Typography variant="subtitle2" noWrap sx={{ fontWeight: 700 }}>
+                            {credit.customerName}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDate(credit.purchaseDate)}
+                          </Typography>
+                        </Box>
                         <Chip
                           label={credit.status.toUpperCase()}
                           size="small"
                           color={credit.status === 'received' ? 'success' : 'error'}
-                          sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                          sx={{ fontWeight: 700, fontSize: '0.65rem', height: 20 }}
                         />
+                      </Box>
+
+                      <Typography variant="body2" sx={{ fontWeight: 500, mb: 2, mt: 1 }}>
+                        {credit.items}
+                      </Typography>
+
+                      <Divider sx={{ mb: 1.5 }} />
+
+                      <Grid container spacing={1}>
+                        <Grid size={{ xs: 6 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Amount
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                            {formatCurrency(credit.amount)}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                            Paid
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>
+                            {formatCurrency(credit.paidAmount)}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </Box>
+          ) : (
+            <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Customer</TableCell>
+                    <TableCell>Items Description</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                    <TableCell align="right">Paid</TableCell>
+                    <TableCell align="center">Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {credits.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                        <Typography color="text.secondary">No credits logged yet.</Typography>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ) : (
+                    credits.slice(0, 50).map((credit) => (
+                      <TableRow
+                        key={credit.id}
+                        hover
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          if (credit.customerId) {
+                            router.push(`/customers/${credit.customerId}`);
+                          }
+                        }}
+                      >
+                        <TableCell sx={{ fontWeight: 600 }}>{formatDate(credit.purchaseDate)}</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>{credit.customerName}</TableCell>
+                        <TableCell sx={{ fontWeight: 500 }}>{credit.items}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>{formatCurrency(credit.amount)}</TableCell>
+                        <TableCell align="right" sx={{ color: 'success.main' }}>{formatCurrency(credit.paidAmount)}</TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={credit.status.toUpperCase()}
+                            size="small"
+                            color={credit.status === 'received' ? 'success' : 'error'}
+                            sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )
         ) : (
           /* Customers Directory */
           <CustomerList
@@ -257,5 +353,13 @@ export default function EmployeeDashboard() {
         </Dialog>
       </Box>
     </DashboardLayout>
+  );
+}
+
+export default function EmployeeDashboard() {
+  return (
+    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>}>
+      <EmployeeDashboardContent />
+    </Suspense>
   );
 }
